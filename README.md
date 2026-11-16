@@ -28,11 +28,11 @@ While running `npm run dev`, use **Skip RSVP for now** below the landing-page fo
 ## Content and visuals
 
 - `src/content.js`: wedding details, evening schedule, trip routes, and travel notes.
-- `coupleRecommendations` in `src/content.js`: side-by-side Noa and Tom picks for coffee, shawarma, wine, cocktails, hikes, beaches, breakfast, and sweets on Explore Israel. Picks are explicitly coming soon; replace the `noa` and `tom` null values with the couple's actual recommendations.
+- `coupleRecommendations` in `src/content.js`: side-by-side Noa and Tom picks for coffee, shawarma, wine, cocktails, hikes, beaches, breakfast, and sweets in the separate **His & Hers** tab (`#picks`). Picks are explicitly coming soon; replace the `noa` and `tom` null values with the couple's actual recommendations.
 - `src/HuppahInfo.jsx`: accessible ceremony explanation tooltip.
-- `src/Countdown.jsx` and `src/weddingCountdown.js`: live header countdown to the Huppah at 20:00 in Israel on Sep 2nd, 2027.
-- `src/App.jsx`: RSVP landing page and post-RSVP navigation, including a separate **Intl? Must knows** tab (`#intl`) for practical travel advice. **Explore Israel** focuses on trip routes and links to the international essentials.
-- `src/PageNavigation.jsx`: previous/next arrows fixed to the left and right edges, guiding guests through the invitation, wedding day, Israel ideas, international essentials, and RSVP. Desktop arrows show their destination on hover or focus; compact mobile arrows have space reserved beside the content. Navigation never submits a reply. Guest pages fade in gently unless reduced motion is enabled.
+- `src/Countdown.jsx` and `src/weddingCountdown.js`: live header countdown to the Huppah at 20:00 in Israel on Sep 2nd, 2027. It stays centered between the logo and date, above the navigation tabs on every page.
+- `src/App.jsx`: RSVP landing page and post-RSVP navigation, including separate **His & Hers** (`#picks`) and **Intl? Must knows** (`#intl`) pages. **Explore Israel** focuses on trip routes and links to both. Mobile navigation uses a two-row grid with touch-sized tabs and a highlighted active page.
+- `src/PageNavigation.jsx`: previous/next arrows guide guests through the invitation, wedding day, Israel ideas, international essentials, and RSVP. Desktop arrows sit at the left and right edges and show their destination on hover or focus. Mobile arrows sit in a fixed bottom bar with visible destinations, touch-sized controls, and space reserved below the content. Navigation never submits a reply. Guest pages fade in gently unless reduced motion is enabled.
 - `src/RSVP.jsx`: form and conditional update preferences.
 - `src/Confetti.jsx`: a short palette-colored celebration on acceptance clicks, respecting reduced-motion preferences.
 - `src/AttendanceReaction.jsx`: a gently pulsing heart for undecided guests and a flying love note for declines. Reactions restart on re-click, dismiss automatically, and become static supportive messages with reduced motion.

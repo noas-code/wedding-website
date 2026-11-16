@@ -5,6 +5,7 @@ export default function PageNavigation({ currentPage, hasRsvp }) {
     { id: 'home', label: 'Your invitation' },
     { id: 'itinerary', label: 'Wedding day' },
     { id: 'israel', label: 'Explore Israel' },
+    { id: 'picks', label: 'His & Hers' },
     { id: 'intl', label: 'Intl? Must knows' },
     { id: 'edit', label: hasRsvp ? 'Edit RSVP' : 'RSVP when ready' },
   ];

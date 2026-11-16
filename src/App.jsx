@@ -8,7 +8,7 @@ import Countdown from './Countdown.jsx';
 import PageNavigation from './PageNavigation';
 
 const demoMode = import.meta.env.VITE_RSVP_DEMO === 'true';
-const pages = ['home', 'edit', 'itinerary', 'israel', 'intl'];
+const pages = ['home', 'edit', 'itinerary', 'israel', 'picks', 'intl'];
 const tokenKey = 'noa-tom-rsvp-token';
 const previewKey = 'noa-tom-local-preview';
 
@@ -107,11 +107,12 @@ export default function App() {
     <a className="skip-link" href="#main">Skip to content</a>
     <header className="header">
       <a className="wordmark" href="#home" aria-label="Noa and Tom home">n<span>&</span>t<span className="wordmark-dot">.</span></a>
+      <div className="header-countdown-center"><Countdown /></div>
       {hasGuestAccess ? <nav aria-label="Guest navigation">
-        {[['home', 'Your invitation'], ['edit', rsvp ? 'Edit RSVP' : 'RSVP'], ['itinerary', 'Wedding day'], ['israel', 'Explore Israel'], ['intl', 'Intl? Must knows']].map(([id, label]) =>
+        {[['home', 'Your invitation'], ['edit', rsvp ? 'Edit RSVP' : 'RSVP'], ['itinerary', 'Wedding day'], ['israel', 'Explore Israel'], ['picks', 'His & Hers'], ['intl', 'Intl? Must knows']].map(([id, label]) =>
           <a key={id} href={`#${id}`} aria-current={currentPage === id ? 'page' : undefined}>{label}</a>)}
-      </nav> : <div className="header-countdown-center"><Countdown /></div>}
-      <div className="header-celebration"><span className="header-date">{wedding.displayDate}</span>{hasGuestAccess && <Countdown />}</div>
+      </nav> : null}
+      <div className="header-celebration"><span className="header-date">{wedding.displayDate}</span></div>
     </header>
     <main id="main">
       {preview && !rsvp && <div className="preview-banner"><p>Local preview / no RSVP saved</p><button type="button" onClick={endPreview}>Back to landing page</button></div>}
@@ -147,14 +148,15 @@ export default function App() {
           <div className="page-heading israel-hero"><div><p className="eyebrow">ONE WEDDING. A WHOLE COUNTRY TO EXPLORE.</p><h1 className="page-title" ref={heading} tabIndex={-1}>A little Israel.<br /><em>A lot to fall for.</em></h1></div><p className="intro">Salty hair. Long lunches. Ancient streets.<br />Our recipe for a trip beyond the dance floor.</p></div>
           <div className="trip-selector" role="group" aria-label="Choose your trip length">{trips.map(option => <button key={option.id} aria-pressed={trip === option.id} onClick={() => setTrip(option.id)}>{option.label}<span>{option.duration}</span></button>)}</div>
           {trips.filter(option => option.id === trip).map(option => <div key={option.id} className="trip-content"><div className="trip-intro"><p className="eyebrow">{option.subtitle}</p><h2>{option.title}</h2><p>{option.description}</p></div><div className="trip-stops">{option.stops.map((stop, index) => <article key={stop.title}><span className="stop-number">0{index + 1}</span><div><p className="eyebrow">{stop.area}</p><h3>{stop.title}</h3><p>{stop.description}</p><p className="local-tip">{stop.tip}</p></div></article>)}</div></div>)}
-          <section className="couple-recs" aria-labelledby="couple-recs-heading">
-            <div className="recs-heading"><div><p className="eyebrow">HIS, HERS & YOUR NEXT FAVORITE</p><h2 id="couple-recs-heading">Two locals.<br /><em>Very strong opinions.</em></h2></div><p>Our little black book of good things.<br />We're still comparing notes. Our personal picks are coming soon.</p></div>
+          <a className="text-link picks-link" href="#picks">His & Hers: our personal picks <span aria-hidden="true">&#8599;</span></a>
+          <a className="text-link trip-practical-link" href="#intl">Travelling from abroad? The must-knows <span aria-hidden="true">&#8599;</span></a>
+        </section> :
+        currentPage === 'picks' ? <section className="inner-page picks-page" key="picks" aria-labelledby="couple-recs-heading">
+            <div className="page-heading"><div><p className="eyebrow">HIS, HERS & YOUR NEXT FAVORITE</p><h1 className="page-title" id="couple-recs-heading" ref={heading} tabIndex={-1}>Two locals.<br /><em>Very strong opinions.</em></h1></div><p className="intro">Our little black book of good things.<br />We're still comparing notes. Our personal picks are coming soon.</p></div>
             <div className="recs-grid">{coupleRecommendations.map(recommendation => <article className="rec-card" key={recommendation.category}>
               <div className="rec-category"><span className="rec-emoji" aria-hidden="true">{recommendation.emoji}</span><div><h3>{recommendation.category}</h3><p>{recommendation.tagline}</p></div></div>
               <div className="rec-picks">{[['noa', 'Noa'], ['tom', 'Tom']].map(([key, name]) => <div className={`rec-pick rec-pick-${key}`} key={key}><p className="rec-person">{name}'s pick</p><p className={recommendation[key] ? 'rec-place' : 'rec-pending'}>{recommendation[key] || 'Coming soon'}</p></div>)}</div>
             </article>)}</div>
-          </section>
-          <a className="text-link trip-practical-link" href="#intl">Travelling from abroad? The must-knows <span aria-hidden="true">&#8599;</span></a>
         </section> :
         currentPage === 'intl' ? <section className="inner-page" key="intl">
           <div className="page-heading"><div><p className="eyebrow">THE GOOD-TO-KNOW PART</p><h1 className="page-title" ref={heading} tabIndex={-1}>Less logistics.<br /><em>More living.</em></h1></div><p className="intro">Coming from abroad? Start here.<br />The practical bits, so you can focus on the good bits.</p></div>
@@ -169,7 +171,8 @@ export default function App() {
             ['edit', '01', 'The little details', rsvp ? 'Edit RSVP' : 'RSVP when ready', rsvp ? 'Change your plans, guest details, or how we keep in touch.' : 'No response saved yet. Send your reply whenever you are ready.'],
             ['itinerary', '02', 'From hello to last dance', 'Wedding day itinerary', 'A first look at the evening, with final details to follow.'],
             ['israel', '03', 'Stay a little longer', 'Your perfect Israel trip', 'A few days or a whole week. Make the journey part of the story.'],
-            ['intl', '04', 'The good-to-know part', 'Intl? Must knows', 'Entry requirements, getting here, and the practical bits for guests coming from abroad.'],
+            ['picks', '04', 'His, hers & your next favorite', 'His & Hers', 'Our personal picks for coffee, food, beaches, and a little adventure.'],
+            ['intl', '05', 'The good-to-know part', 'Intl? Must knows', 'Entry requirements, getting here, and the practical bits for guests coming from abroad.'],
           ].map(([id, number, label, title, description]) => <a className="hub-card" href={`#${id}`} key={id}><div><span>{number}</span><span aria-hidden="true">&#8599;</span></div><p className="eyebrow">{label}</p><h2>{title}</h2><p>{description}</p></a>)}</div>
           {rsvp && <><p className="saved-preferences">{rsvp.whatsappUpdates || rsvp.emailUpdates ? `You opted into wedding updates via ${[rsvp.whatsappUpdates && 'WhatsApp', rsvp.emailUpdates && 'email'].filter(Boolean).join(' and ')}. We'll share details when they're ready.` : 'You opted out of wedding updates. You can always check the details here.'} No messages are sent automatically by this website.</p>
           <button className="text-link forget-button" onClick={forget}>Not you? Clear this browser's RSVP access</button></>}

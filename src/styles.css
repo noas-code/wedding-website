@@ -13,19 +13,19 @@ h1,h2,h3,p{margin:0}
 h1,h2,h3{font-family:var(--serif);font-weight:500;color:var(--accent)}
 em{font-weight:500}
 .site-shell{max-width:1600px;margin:auto;padding:0 6%}
-.header{min-height:106px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:28px}
+.header{min-height:106px;border-bottom:1px solid var(--line);display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:12px 28px;padding:16px 0}
 .wordmark{font-family:var(--serif);font-size:38px;letter-spacing:-3px;text-decoration:none;white-space:nowrap}
 .wordmark span{font-style:italic;font-size:26px;margin:0 3px}
 .wordmark .wordmark-dot{margin:0;font-size:38px;color:var(--accent)}
 .header-note,.header-date,.eyebrow{font-size:10px;letter-spacing:2.2px;font-weight:600;line-height:1.6}
 .header-note{color:var(--muted);font-size:9px}
 .header-date{letter-spacing:1px;white-space:nowrap;background:var(--yellow);color:var(--ink);padding:6px 10px;border-radius:2px}
-.header-celebration{display:flex;flex-direction:column;align-items:end;gap:6px;flex-shrink:0}
+.header-celebration{display:flex;flex-direction:column;align-items:end;gap:6px;justify-self:end;grid-column:3;grid-row:1}
 .header-countdown{display:flex;flex-direction:column;align-items:end;gap:2px;color:var(--accent);font-size:11px;line-height:1.5}
 .countdown-label{color:var(--muted);font-size:9px}
 .countdown-digits{font-variant-numeric:tabular-nums;white-space:nowrap;letter-spacing:.4px}
 .header-countdown-center .header-countdown{align-items:center}
-.header nav{display:flex;gap:28px;align-items:center}
+.header nav{display:flex;gap:28px;align-items:center;justify-content:center;grid-column:1/-1;grid-row:2}
 .header nav a{font-size:12px;text-decoration:none;color:var(--muted);padding:12px 0;border-bottom:1px solid transparent}
 .header nav a:hover,.header nav a[aria-current]{color:var(--accent);border-color:var(--accent)}
 .invitation-layout{display:grid;grid-template-columns:1.1fr 1fr;gap:6%;padding:36px 0 48px;align-items:start}
@@ -272,12 +272,26 @@ footer>span:last-child{font-size:8px;letter-spacing:1.8px}
 @media(max-width:700px){.wedding-hero{min-height:620px;padding:28px 22px;align-items:end;margin-bottom:25px}.wedding-hero-photo{object-position:62% center}.wedding-hero::before{background:linear-gradient(0deg,rgba(14,25,39,.94),rgba(14,25,39,.74) 42%,rgba(14,25,39,.13) 73%,rgba(14,25,39,.02))}.wedding-hero-copy{max-width:100%}.wedding-hero .page-title{font-size:44px}.wedding-hero .eyebrow{font-size:9px;letter-spacing:1.4px}}
 @media(max-width:700px){.wedding-day .timeline article{grid-template-columns:72px minmax(0,1fr);gap:15px}.wedding-day .timeline .timeline-time{font-size:23px}}
 @media(min-width:701px) and (max-width:1000px){.header{flex-wrap:wrap;padding:16px 0;gap:12px}.header nav{order:3;flex-basis:100%;justify-content:space-between}}
-@media(max-width:700px){.header nav{flex-wrap:wrap;justify-content:flex-start;column-gap:18px;row-gap:2px}}
+@media(max-width:700px){
+  .header nav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;width:100%;padding:6px;background:var(--wash);border:1px solid var(--line);border-radius:10px}
+  .header nav a{display:flex;align-items:center;justify-content:center;text-align:center;min-height:44px;padding:8px 6px;border:1px solid transparent;border-radius:6px;font-size:11px;font-weight:500;line-height:1.4}
+  .header nav a:hover{background:var(--paper);border-color:var(--line)}
+  .header nav a[aria-current]{background:var(--yellow);color:var(--ink);border-color:var(--yellow);box-shadow:0 1px 3px rgba(23,43,80,.08)}
+}
+.picks-link{margin-top:32px}
 @media(max-width:700px){.header-countdown-center{order:3;flex-basis:100%}}
 @media(max-width:700px){.attendance-reaction{right:16px;bottom:16px;padding:16px;gap:12px}}
 @media(prefers-reduced-motion:reduce){.attendance-reaction,.attendance-reaction *{animation:none!important}.reaction-ring,.reaction-trail{display:none}}
 @media(max-width:1000px){.page-step{width:28px;height:44px;border-radius:16px}.page-step-previous{left:3px}.page-step-next{right:3px}.page-step svg{width:16px}.page-step-label{display:none}}
-@media(max-width:700px){.site-shell.guest-access{padding:0 10%}.page-step-previous{left:1px}.page-step-next{right:1px}}
+@media(max-width:700px){
+  .site-shell.guest-access{padding:0 6% calc(80px + env(safe-area-inset-bottom))}
+  .page-navigation-links{position:fixed;bottom:0;left:0;right:0;z-index:10;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:var(--paper);border-top:1px solid var(--line);box-shadow:0 -2px 10px rgba(23,43,80,.06)}
+  .page-navigation-links .page-step{position:static;transform:none;display:flex;gap:8px;width:auto;max-width:48%;min-width:44px;min-height:44px;height:auto;padding:10px 12px;border-radius:6px;box-shadow:none}
+  .page-navigation-links .page-step-next{margin-left:auto;flex-direction:row-reverse}
+  .page-navigation-links .page-step-label{display:block;position:static;opacity:1;white-space:normal;padding:0;border:0;background:transparent;font-size:10px;line-height:1.5}
+  .page-navigation-links .page-step-next .page-step-label{text-align:right}
+  .page-navigation-links .page-step svg{width:20px;height:20px}
+}
 @media(max-width:700px){.israel-hero.page-heading{min-height:460px;padding:28px 22px;justify-content:flex-end;background-position:center,60% center}.israel-hero .page-title{font-size:clamp(34px,8vw,49px)}.israel-hero .eyebrow{font-size:9px;letter-spacing:1.4px}}
 @media(prefers-reduced-motion:reduce){.inner-page,.edit-layout{animation:none}.page-step:hover svg{transform:none}}
 @media(max-width:700px){.couple-recs{margin-top:40px;padding-top:28px}.recs-heading{display:block;margin-bottom:24px}.recs-heading>p{margin-top:18px}.recs-grid{grid-template-columns:1fr;gap:14px}.rec-card{padding:22px}.rec-category h3{font-size:25px}}
