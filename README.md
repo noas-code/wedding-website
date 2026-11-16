@@ -6,6 +6,8 @@ Guests provide their name, country calling code and phone number, email, attenda
 
 A prominent **Already replied?** banner above the invitation opens edit-link recovery. Communication preferences use visible checkboxes so guests can clearly select multiple channels.
 
+On mobile, **Your RSVP** scrolls smoothly to the form, with an instant jump when reduced motion is preferred.
+
 Attendance choices are **Wouldn't miss it**, **Can't make it**, and **I don't know yet**; none is selected by default. Accepting triggers confetti unless reduced motion is enabled. Undecided replies are saved separately from acceptances and declines, unlock the guest pages, and can be edited later. They do not count as confirmed guests; party and dietary details are collected when accepting.
 
 After replying, guests can visit separate views for **Edit RSVP**, **Wedding Day Itinerary**, and **Your Perfect Israel Trip**. The itinerary includes the venue links and six scheduled events, starting with pickup from Tel Aviv Arlozorov Train Station at 17:30 / 5:30 PM. Times appear in both 24-hour and AM/PM formats, local to Israel, with dancing and late-night food at midnight. A few emojis add playful accents to the descriptions. The Huppah info icon explains the canopy on hover, focus, or tap. The travel guide offers 3-4, 7, and 10-day routes and practical planning advice. Dress code and return transport details are still to come.

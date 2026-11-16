@@ -42,6 +42,8 @@ em{font-weight:500}
 .wedding-details p:first-child{font-weight:500}
 .photo-caption{position:absolute;bottom:24px;left:35px;font-size:8px;letter-spacing:2px;color:var(--paper)}
 .photo-rsvp{display:none}
+@media(max-width:700px) and (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+@media(max-width:700px){#rsvp{scroll-margin-top:16px}}
 .invitation-form{max-width:510px;width:100%;justify-self:end}
 .rsvp-card{padding:33px 34px;background:var(--paper);border:1px solid var(--line);border-radius:3px;width:100%}
 .form-heading{margin-bottom:25px}
