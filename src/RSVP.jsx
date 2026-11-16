@@ -2,11 +2,13 @@ import { useCallback, useState } from 'react';
 import { countryCodes, internationalPhone, splitPhone } from './phone';
 import Confetti from './Confetti';
 import AttendanceReaction from './AttendanceReaction';
+import RecoverRSVP from './RecoverRSVP';
 
 const demoMode = import.meta.env.VITE_RSVP_DEMO === 'true';
 const emptyResponse = { name: '', email: '', phone: '', attendance: '', guests: [], dietary: '', message: '', whatsappUpdates: false, emailUpdates: false };
 
 export default function RSVP({ initial, token, onSaved }) {
+  const [mode, setMode] = useState('new');
   const [response, setResponse] = useState(() => initial ? { ...initial, guests: initial.guests.slice(1) } : emptyResponse);
   const [guestCount, setGuestCount] = useState(initial?.guests.length || 1);
   const [phone, setPhone] = useState(() => splitPhone(initial?.phone));
@@ -62,6 +64,10 @@ export default function RSVP({ initial, token, onSaved }) {
   }
 
   return <div className="rsvp-card" id="rsvp">
+    {!initial && <div className="rsvp-options" role="group" aria-label="RSVP options">
+      {[['new', 'RSVP'], ['edit', 'Edit RSVP']].map(([value, label]) => <button type="button" key={value} aria-pressed={mode === value} disabled={status.state === 'saving'} onClick={() => { setMode(value); clearReaction(); }}>{label}</button>)}
+    </div>}
+    <div hidden={mode !== 'new'}>
     {reaction && (reaction.attendance === 'yes' ? <Confetti key={reaction.id} onComplete={clearReaction} /> : <AttendanceReaction key={reaction.id} attendance={reaction.attendance} onComplete={clearReaction} />)}
     <div className="form-heading"><p className="eyebrow">{initial ? 'YOUR RSVP / THE LATEST VERSION' : 'YOUR INVITATION STARTS HERE'}</p><h2>{initial ? 'Keep us posted.' : 'Save you a seat?'}</h2><p>{initial ? 'Update your reply below. We will save the new details.' : 'We would love to have you with us. Let us know.'}</p></div>
     {demoMode && <p className="demo-notice" role="note">Preview only. Use made-up details: nothing is sent or saved.</p>}
@@ -94,5 +100,7 @@ export default function RSVP({ initial, token, onSaved }) {
         <p className="privacy-note">{demoMode ? 'This preview does not confirm your attendance.' : 'Your details are stored privately on this server. Only an edit-access key is saved in this browser. You can update your reply after submitting.'}</p>
       </fieldset>
     </form>
+    </div>
+    {!initial && <div hidden={mode !== 'edit'}><RecoverRSVP /></div>}
   </div>;
 }

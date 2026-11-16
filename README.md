@@ -4,7 +4,7 @@ An RSVP-first wedding website for **Sep 2nd, 2027 at Al Hanahal (By the River), 
 
 Guests provide their name, country calling code and phone number, email, attendance, and preferred channels for wedding updates: WhatsApp, email, both, or neither. Israel (+972) is the default; a country selector and custom-code option support international guests. Optional fields cover invited guests and dietary needs.
 
-A prominent **Already replied?** banner above the invitation opens edit-link recovery. Communication preferences use visible checkboxes so guests can clearly select multiple channels.
+The invitation's RSVP card offers **RSVP / Edit RSVP** options, with edit-link recovery inside the same card. Switching options preserves an unfinished reply. Communication preferences use visible checkboxes so guests can clearly select multiple channels.
 
 On mobile, **Your RSVP** scrolls smoothly to the form, with an instant jump when reduced motion is preferred.
 

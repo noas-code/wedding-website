@@ -3,7 +3,6 @@ import { useState } from 'react';
 const demoMode = import.meta.env.VITE_RSVP_DEMO === 'true';
 
 export default function RecoverRSVP() {
-  const [open, setOpen] = useState(false);
   const [identifier, setIdentifier] = useState('');
   const [status, setStatus] = useState({ state: 'idle', message: '' });
 
@@ -25,12 +24,9 @@ export default function RecoverRSVP() {
     }
   }
 
-  return <div className="recovery-entry">
-    <div className="recovery-heading">
-      <div><h2>Already replied?</h2><p>No need to RSVP again. Update your existing reply here.</p></div>
-      <button type="button" aria-expanded={open} aria-controls="recovery-form" onClick={() => setOpen(!open)}>{open ? 'Close' : 'Edit your RSVP'} <span aria-hidden="true">{open ? '\u00d7' : '\u2192'}</span></button>
-    </div>
-    <div id="recovery-form" className="recovery-box" hidden={!open}>
+  return <div>
+    <div className="form-heading"><p className="eyebrow">YOUR RSVP / FIND YOUR REPLY</p><h2>Already replied?</h2><p>No need to RSVP again. Update your existing reply here.</p></div>
+    <div className="recovery-box">
       {demoMode ? <p>This preview does not save RSVPs or send recovery emails. Submit a preview reply to try the edit screen.</p> :
         <form onSubmit={submit}>
           <p>Enter the email or phone number used for your RSVP. We will send an edit link to the email address on your RSVP.</p>

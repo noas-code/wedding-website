@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 import { Globe, Instagram } from 'lucide-react';
 import { wedding, events, trips, travelNotes, coupleRecommendations } from './content';
 import RSVP from './RSVP';
-import RecoverRSVP from './RecoverRSVP';
 import HuppahInfo from './HuppahInfo';
 import Countdown from './Countdown.jsx';
 import PageNavigation from './PageNavigation';
@@ -119,7 +118,6 @@ export default function App() {
       {error && <div className="restore-error" role="alert">{error} <button type="button" onClick={() => location.reload()}>Try again</button></div>}
       {restoring ? <div className="loading" role="status">Opening your invitation...</div> :
         currentPage === 'home' && !hasGuestAccess ? <section className="invitation-layout">
-          <RecoverRSVP />
           <div className="invitation-copy" style={{ '--couple-photo': `url("${import.meta.env.BASE_URL}noa-and-tom.png")` }}>
             <p className="eyebrow"><span className="little-line" /> WE'RE GETTING MARRIED</p>
             <h1 ref={heading} tabIndex={-1}>Noa <span className="ampersand">&</span><br />Tom</h1>
