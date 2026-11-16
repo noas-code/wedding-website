@@ -8,6 +8,8 @@ The invitation's RSVP card offers **RSVP / Edit RSVP** options, with edit-link r
 
 On mobile, **Your RSVP** scrolls smoothly to the form, with an instant jump when reduced motion is preferred.
 
+International essentials separates the Sunday-Thursday work week from transport guidance covering railways, buses, station tickets, Rav-Kav, Moovit/Pango, payment limitations, and modified weekend services. Destination-specific transport details are still to be added to the recommended itineraries.
+
 Attendance choices are **Wouldn't miss it**, **Can't make it**, and **I don't know yet**; none is selected by default. Accepting triggers confetti unless reduced motion is enabled. Undecided replies are saved separately from acceptances and declines, unlock the guest pages, and can be edited later. They do not count as confirmed guests; party and dietary details are collected when accepting.
 
 After replying, guests can visit separate views for **Edit RSVP**, **Wedding Day Itinerary**, and **Your Perfect Israel Trip**. The itinerary includes the venue links and six scheduled events, starting with pickup from Tel Aviv Arlozorov Train Station at 17:30 / 5:30 PM. Times appear in both 24-hour and AM/PM formats, local to Israel, with dancing and late-night food at midnight. The return bus to Tel Aviv leaves around 01:00 / 1 AM after the wedding. A few emojis add playful accents to the descriptions. The Huppah info icon explains the canopy on hover, focus, or tap. The travel guide offers 3-4, 7, and 10-day routes and practical planning advice. September essentials explains festive, not overly formal wedding attire.

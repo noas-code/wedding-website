@@ -102,3 +102,14 @@ test('longer routes and prompts include Jerusalem, Dead Sea, wineries, and optio
   assert.match(buildTripPrompt('long'), /required no-fly interval/);
   assert.doesNotMatch(buildTripPrompt('week'), /Eilat/);
 });
+
+test('separates transport guidance from the work-week explanation', () => {
+  const weekend = travelNotes.find(note => note.title === 'The weekend rhythm');
+  const transport = travelNotes.find(note => note.title === 'Transportation');
+  assert.match(weekend.description, /Sunday through Thursday/);
+  assert.match(weekend.description, /Friday and Saturday/);
+  assert.doesNotMatch(weekend.description, /transport|buses|railways/i);
+  for (const detail of [/railways and buses/, /train stations/, /Moovit and Pango/, /Apple Pay/, /Tel Aviv/, /modified schedules/, /local exceptions/, /recommended itineraries/]) {
+    assert.match(transport.description, detail);
+  }
+});
