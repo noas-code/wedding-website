@@ -5,6 +5,7 @@ import RSVP from './RSVP';
 import HuppahInfo from './HuppahInfo';
 import Countdown from './Countdown.jsx';
 import PageNavigation from './PageNavigation';
+import TripPrompt from './TripPrompt';
 
 const demoMode = import.meta.env.VITE_RSVP_DEMO === 'true';
 const pages = ['home', 'edit', 'itinerary', 'israel', 'picks', 'intl'];
@@ -145,6 +146,7 @@ export default function App() {
         currentPage === 'israel' ? <section className="inner-page israel-page" key="israel">
           <div className="page-heading israel-hero"><div><p className="eyebrow">ONE WEDDING. A WHOLE COUNTRY TO EXPLORE.</p><h1 className="page-title" ref={heading} tabIndex={-1}>A little Israel.<br /><em>A lot to fall for.</em></h1></div><p className="intro">Salty hair. Long lunches. Ancient streets.<br />Our recipe for a trip beyond the dance floor.</p></div>
           <div className="trip-selector" role="group" aria-label="Choose your trip length">{trips.map(option => <button key={option.id} aria-pressed={trip === option.id} onClick={() => setTrip(option.id)}>{option.label}<span>{option.duration}</span></button>)}</div>
+          <TripPrompt key={trip} tripId={trip} />
           {trips.filter(option => option.id === trip).map(option => <div key={option.id} className="trip-content"><div className="trip-intro"><p className="eyebrow">{option.subtitle}</p><h2>{option.title}</h2><p>{option.description}</p></div><div className="trip-stops">{option.stops.map((stop, index) => <article key={stop.title}><span className="stop-number">0{index + 1}</span><div><p className="eyebrow">{stop.area}</p><h3>{stop.title}</h3><p>{stop.description}</p><p className="local-tip">{stop.tip}</p></div></article>)}</div></div>)}
           <a className="text-link picks-link" href="#picks">His & Hers: our personal picks <span aria-hidden="true">&#8599;</span></a>
           <a className="text-link trip-practical-link" href="#intl">Travelling from abroad? The must-knows <span aria-hidden="true">&#8599;</span></a>

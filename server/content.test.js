@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { wedding, events, trips, travelNotes, coupleRecommendations } from '../src/content.js';
+import { buildTripPrompt } from '../src/tripPrompt.js';
 
 test('uses the unambiguous wedding date throughout trip content', () => {
   assert.equal(wedding.displayDate, 'Sep 2nd, 2027');
@@ -47,4 +48,36 @@ test('provides his-and-hers recommendation categories without inventing personal
     assert.equal(item.noa, null);
     assert.equal(item.tom, null);
   }
+});
+
+test('builds length-specific planning prompts with wedding logistics and no invented picks', () => {
+  for (const trip of trips) {
+    const prompt = buildTripPrompt(trip.id);
+    assert.ok(prompt.includes(wedding.displayDate));
+    assert.ok(prompt.includes(wedding.venue.name));
+    assert.ok(prompt.includes(events[0].when));
+    assert.match(prompt, /Return transport is not yet confirmed/);
+    assert.match(prompt, /recommendations.*are coming soon/);
+    assert.match(prompt, /Do not book anything/);
+    assert.doesNotMatch(prompt, /\bnull\b|\bundefined\b/);
+  }
+  assert.match(buildTripPrompt('short'), /3-4 days; ask which duration fits my flights/);
+  assert.doesNotMatch(buildTripPrompt('short'), /Jerusalem|Jordan|Greece/);
+  assert.match(buildTripPrompt('week'), /7 days.*Jerusalem/);
+  assert.doesNotMatch(buildTripPrompt('week'), /Jordan|Greece/);
+  const long = buildTripPrompt('long');
+  assert.match(long, /10 days/);
+  assert.match(long, /Jordan or Greece/);
+  assert.match(long, /including travel days/);
+  assert.match(long, /Do not assume direct flights, an open land crossing, or visa-free entry/);
+});
+
+test('includes only published personal recommendations in copied prompts', () => {
+  const prompt = buildTripPrompt('week', [
+    { category: 'Coffee', noa: 'Example Cafe', tom: null },
+    { category: 'Beach', noa: null, tom: 'Example Beach' },
+  ]);
+  assert.match(prompt, /Coffee: Noa recommends Example Cafe/);
+  assert.match(prompt, /Beach: Tom recommends Example Beach/);
+  assert.doesNotMatch(prompt, /Tom recommends null|Noa recommends null/);
 });
