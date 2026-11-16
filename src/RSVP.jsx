@@ -4,7 +4,7 @@ import Confetti from './Confetti';
 import AttendanceReaction from './AttendanceReaction';
 
 const demoMode = import.meta.env.VITE_RSVP_DEMO === 'true';
-const emptyResponse = { name: '', email: '', phone: '', attendance: 'yes', guests: [], dietary: '', message: '', hasWhatsapp: null, keepUpdated: null };
+const emptyResponse = { name: '', email: '', phone: '', attendance: '', guests: [], dietary: '', message: '', whatsappUpdates: false, emailUpdates: false };
 
 export default function RSVP({ initial, token, onSaved }) {
   const [response, setResponse] = useState(() => initial ? { ...initial, guests: initial.guests.slice(1) } : emptyResponse);
@@ -78,15 +78,9 @@ export default function RSVP({ initial, token, onSaved }) {
         </div>
         {countryChoice === 'custom' && <label>Your country calling code <span>*</span><input type="tel" name="customCountryCode" required maxLength={4} pattern={String.raw`\+[1-9][0-9]{0,2}`} title="Enter + followed by your 1 to 3 digit country calling code." autoComplete="tel-country-code" placeholder="e.g. +386" value={phone.countryCode} onChange={event => setPhone(previous => ({ ...previous, countryCode: event.target.value }))} /></label>}
         <label>Email address <span>*</span><input type="email" name="email" required maxLength={254} autoComplete="email" placeholder="you@example.com" value={response.email} onChange={event => update('email', event.target.value)} /></label>
-        <fieldset className="choice-field"><legend>Do you have WhatsApp on this number? <span>*</span></legend><div className="choice-row">
-          {[[true, 'Yes, of course'], [false, 'No, actually']].map(([value, label]) => <label className={response.hasWhatsapp === value ? 'choice selected' : 'choice'} key={String(value)}><input type="radio" name="whatsapp" required checked={response.hasWhatsapp === value} onChange={() => setResponse(previous => ({ ...previous, hasWhatsapp: value, keepUpdated: null }))} />{label}</label>)}
+        <fieldset className="choice-field"><legend>How do you want us to communicate with you?</legend><p className="communication-hint">Choose either, both, or neither for wedding updates.</p><div className="choice-row">
+          {[['whatsappUpdates', 'WhatsApp'], ['emailUpdates', 'Email']].map(([field, label]) => <label className={response[field] ? 'choice selected' : 'choice'} key={field}><input type="checkbox" name={field} checked={response[field]} onChange={event => update(field, event.target.checked)} />{label}</label>)}
         </div></fieldset>
-        {response.hasWhatsapp !== null && <div className="updates-box">
-          {response.hasWhatsapp === false ? <><p className="whatsapp-joke">No WhatsApp? A little mysterious.<br />Still very much invited.</p><p className="updates-description">Want to stay in the loop by email instead?</p></> : <p className="updates-description">Want wedding details and updates on WhatsApp?</p>}
-          <fieldset className="choice-field"><legend className="sr-only">Would you like to receive wedding updates? Required</legend><div className="choice-row">
-            {[[true, 'Keep me in the loop'], [false, "No updates, thanks"]].map(([value, label]) => <label className={response.keepUpdated === value ? 'choice selected' : 'choice'} key={String(value)}><input type="radio" name="updates" required checked={response.keepUpdated === value} onChange={() => update('keepUpdated', value)} />{label}</label>)}
-          </div></fieldset>
-        </div>}
         {response.attendance === 'yes' && <details className="extra-details" open={initial ? true : undefined}>
           <summary>Guests, dietary needs & a note for us <span aria-hidden="true">+</span></summary>
           <div className="extra-fields"><label>People in your party<select name="partySize" value={guestCount} onChange={event => setGuestCount(Number(event.target.value))}>{Array.from({ length: 10 }, (_, index) => <option key={index} value={index + 1}>{index + 1}{index === 0 ? ' (just me)' : ' (including me)'}</option>)}</select><small>Please include only guests named on your invitation.</small></label>

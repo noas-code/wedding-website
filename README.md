@@ -2,9 +2,9 @@
 
 An RSVP-first wedding website for **Sep 2nd, 2027 at Al Hanahal (By the River), Hadera, Israel**. The landing page uses the couple's own photograph, locally bundled fonts, and a Mediterranean after-party palette: pale sky blue, electric cobalt, butter-yellow selections with navy text, and subtle coral-pink accents. All guest-facing dates use the same written format to avoid international date ambiguity.
 
-Guests provide their name, country calling code and phone number, email, attendance, WhatsApp availability, and an explicit wedding-update preference. Israel (+972) is the default; a country selector and custom-code option support international guests. Choosing no WhatsApp reveals a gentle joke and an email-update opt-in. Optional fields cover invited guests and dietary needs.
+Guests provide their name, country calling code and phone number, email, attendance, and preferred channels for wedding updates: WhatsApp, email, both, or neither. Israel (+972) is the default; a country selector and custom-code option support international guests. Optional fields cover invited guests and dietary needs.
 
-Attendance choices are **Wouldn't miss it**, **Can't make it**, and **I don't know yet**. Undecided replies are saved separately from acceptances and declines, unlock the guest pages, and can be edited later. They do not count as confirmed guests; party and dietary details are collected when accepting. Existing replies and private edit keys are preserved when the database upgrades to support this status.
+Attendance choices are **Wouldn't miss it**, **Can't make it**, and **I don't know yet**; none is selected by default. Accepting triggers confetti unless reduced motion is enabled. Undecided replies are saved separately from acceptances and declines, unlock the guest pages, and can be edited later. They do not count as confirmed guests; party and dietary details are collected when accepting.
 
 After replying, guests can visit separate views for **Edit RSVP**, **Wedding Day Itinerary**, and **Your Perfect Israel Trip**. The itinerary includes the venue links and six scheduled events, starting with pickup from Tel Aviv Arlozorov Train Station at 17:30 / 5:30 PM. Times appear in both 24-hour and AM/PM formats, local to Israel, with dancing and late-night food at midnight. A few emojis add playful accents to the descriptions. The Huppah info icon explains the canopy on hover, focus, or tap. The travel guide offers 3-4, 7, and 10-day routes and practical planning advice. Dress code and return transport details are still to come.
 
@@ -40,18 +40,20 @@ The photo and fonts are served locally; no remote map, image, or font request is
 
 ## Private, persistent RSVPs
 
-Responses are saved in `data/rsvps.sqlite`, not in browser storage. Phone numbers and WhatsApp/update preferences are stored alongside attendance and guest details. The existing database is migrated without deleting old responses.
+Responses are saved in `data/rsvps.sqlite`, not in browser storage. Phone numbers and update preferences are stored alongside attendance and guest details. Existing update preferences migrate to WhatsApp or email according to the previously selected channel; opt-outs remain opt-outs.
 
 The server issues a random private edit-access key on submission. Only that key is stored in this browser, allowing guests to restore and edit their own RSVP after refreshing. The authorized edit endpoint permits changing email addresses without creating duplicate responses. Knowing someone's email alone does not grant access to their RSVP.
 
-There is no public endpoint listing guest details. On a shared computer, use **Clear this browser's RSVP access** in the guest hub when finished. Treat the key as a secret. Editing from a different browser or after clearing access currently requires contacting the hosts; there is no email-based recovery yet. Legacy responses are preserved but do not gain a browser edit key automatically.
+There is no public endpoint listing guest details. On a shared computer, use **Clear this browser's RSVP access** in the guest hub when finished. Treat the key as a secret. When email recovery is configured, a guest can enter their email or phone number on the landing page to request a single-use link sent to the email address on their RSVP. Links expire after 15 minutes. A shared phone number sends a separate link to each matching RSVP's email address; it does not expose those addresses to the requester. Legacy responses can also regain access this way.
 
-No WhatsApp messages or emails are sent automatically. Update selections record guests' preferences for the hosts to use later; they are not a messaging integration.
+To enable recovery on a Node host, configure `PUBLIC_URL` as the site's full HTTPS URL, `RESEND_API_KEY` as a Resend API key, and `RESEND_FROM` as a sender on a verified Resend domain. The server sends recovery links through Resend; it reports recovery as unavailable when these settings are missing. For local development only, `PUBLIC_URL` may use HTTP on `localhost` or `127.0.0.1`. Never commit the API key. Configure a persistent database and an HTTPS deployment before inviting guests. Recovery has basic per-contact and per-connection-IP throttling; configure additional rate limiting at the hosting edge, especially behind a proxy or across multiple server instances.
+
+No wedding updates are sent automatically. Update selections record guests' preferences for the hosts to use later; they are not a messaging integration. Recovery links are emailed when recovery is configured and requested.
 
 To inspect responses locally:
 
 ```sh
-node --input-type=module -e "import { DatabaseSync } from 'node:sqlite'; const db = new DatabaseSync('data/rsvps.sqlite', { readOnly: true }); console.table(db.prepare('SELECT name, email, phone, has_whatsapp, keep_updated, attendance, guests, dietary, message, updated_at FROM rsvps').all()); db.close();"
+node --input-type=module -e "import { DatabaseSync } from 'node:sqlite'; const db = new DatabaseSync('data/rsvps.sqlite', { readOnly: true }); console.table(db.prepare('SELECT name, email, phone, whatsapp_updates, email_updates, attendance, guests, dietary, message, updated_at FROM rsvps').all()); db.close();"
 ```
 
 Keep the database private, back it up, and delete guest data when no longer needed. Never place it inside the public build folder. Party size includes the respondent and is capped at 10; invitation-specific limits are not yet enforced.
@@ -68,7 +70,7 @@ The production server serves the built site and API at **http://127.0.0.1:3001**
 
 ## Hosting later
 
-The GitHub Pages workflow builds a **preview only** with `VITE_RSVP_DEMO=true`. Use made-up details. It demonstrates the form and guest pages, but sends no requests, saves no responses or edit keys, and does not confirm attendance. Refreshing clears the preview reply.
+The GitHub Pages workflow builds a **preview only** with `VITE_RSVP_DEMO=true`. Use made-up details. It demonstrates the form and guest pages, but sends no requests or recovery emails, saves no responses or edit keys, and does not confirm attendance. Refreshing clears the preview reply.
 
 For a real RSVP deployment, use a Node-compatible host with persistent storage for SQLite. Static-only hosting cannot run this API.
 

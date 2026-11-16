@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Globe, Instagram } from 'lucide-react';
 import { wedding, events, trips, travelNotes, coupleRecommendations } from './content';
 import RSVP from './RSVP';
+import RecoverRSVP from './RecoverRSVP';
 import HuppahInfo from './HuppahInfo';
 import Countdown from './Countdown.jsx';
 import PageNavigation from './PageNavigation';
@@ -16,7 +17,8 @@ export default function App() {
   const [rsvp, setRsvp] = useState(null);
   const [preview, setPreview] = useState(() => import.meta.env.DEV && sessionStorage.getItem(previewKey) === '1');
   const [token, setToken] = useState('');
-  const [restoring, setRestoring] = useState(!demoMode && Boolean(localStorage.getItem(tokenKey)));
+  const recoveryToken = useRef(new URLSearchParams(location.hash.slice(1)).get('recover'));
+  const [restoring, setRestoring] = useState(!demoMode && Boolean(recoveryToken.current || localStorage.getItem(tokenKey)));
   const [error, setError] = useState('');
   const [trip, setTrip] = useState('week');
   const heading = useRef(null);
@@ -33,11 +35,21 @@ export default function App() {
   useEffect(() => {
     if (demoMode) return;
     const savedToken = localStorage.getItem(tokenKey);
-    if (!savedToken) return;
+    const recoveryLink = recoveryToken.current;
+    if (!savedToken && !recoveryLink) return;
+    if (recoveryLink) history.replaceState(null, '', `${location.pathname}${location.search}`);
     const controller = new AbortController();
     async function restore() {
       try {
-        const result = await fetch('/api/rsvps/me', { headers: { Authorization: `Bearer ${savedToken}` }, signal: controller.signal });
+        let accessToken = savedToken;
+        if (recoveryLink) {
+          const exchange = await fetch('/api/rsvps/recovery/consume', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token: recoveryLink }), signal: controller.signal });
+          const data = await exchange.json();
+          if (!exchange.ok) throw new Error(data.error || 'We could not open this recovery link. Please request a new one.');
+          accessToken = data.token;
+          localStorage.setItem(tokenKey, accessToken);
+        }
+        const result = await fetch('/api/rsvps/me', { headers: { Authorization: `Bearer ${accessToken}` }, signal: controller.signal });
         if (result.status === 401) {
           localStorage.removeItem(tokenKey);
           throw new Error('This RSVP edit link has expired. Please contact Noa & Tom if you already replied.');
@@ -45,7 +57,8 @@ export default function App() {
         if (!result.ok) throw new Error('We could not load your saved RSVP. Please refresh to try again.');
         const data = await result.json();
         setRsvp(data.rsvp);
-        setToken(savedToken);
+        setToken(accessToken);
+        if (recoveryLink) location.hash = 'edit';
       } catch (error) {
         if (error.name !== 'AbortError') setError(error.message);
       } finally {
@@ -113,7 +126,7 @@ export default function App() {
             <a className="photo-rsvp" href="#rsvp">Your RSVP <span aria-hidden="true">&darr;</span></a>
             <p className="photo-caption">THE NEXT CHAPTER STARTS WITH YOU.</p>
           </div>
-          <div className="invitation-form"><RSVP onSaved={saved} /><p className="form-footnote">A little reply. The beginning of a very good trip.</p>{import.meta.env.DEV && <div className="preview-entry"><button className="text-link" type="button" onClick={startPreview}>Skip RSVP for now <span aria-hidden="true">&rarr;</span></button><p>Local preview only. No response will be saved.</p></div>}</div>
+          <div className="invitation-form"><RSVP onSaved={saved} /><RecoverRSVP /><p className="form-footnote">A little reply. The beginning of a very good trip.</p>{import.meta.env.DEV && <div className="preview-entry"><button className="text-link" type="button" onClick={startPreview}>Skip RSVP for now <span aria-hidden="true">&rarr;</span></button><p>Local preview only. No response will be saved.</p></div>}</div>
         </section> :
         currentPage === 'edit' ? <section className="edit-layout" key="edit">
           <div><p className="eyebrow">{rsvp ? 'PLANS CHANGE. WE GET IT.' : 'WHEN YOU ARE READY'}</p><h1 className="page-title" ref={heading} tabIndex={-1}>{rsvp ? <>A little<br /><em>update.</em></> : <>Save us<br /><em>a dance.</em></>}</h1><p className="intro">{rsvp ? <>New number? A dietary note?<br />Keep your details as fresh as your dance moves.</> : 'Just exploring? Take your time. Submit this form only when you want to save a real RSVP.'}</p><a className="text-link" href="#home">Back to your invitation <span aria-hidden="true">&larr;</span></a></div>
@@ -157,7 +170,7 @@ export default function App() {
             ['israel', '03', 'Stay a little longer', 'Your perfect Israel trip', 'A few days or a whole week. Make the journey part of the story.'],
             ['intl', '04', 'The good-to-know part', 'Intl? Must knows', 'Entry requirements, getting here, and the practical bits for guests coming from abroad.'],
           ].map(([id, number, label, title, description]) => <a className="hub-card" href={`#${id}`} key={id}><div><span>{number}</span><span aria-hidden="true">&#8599;</span></div><p className="eyebrow">{label}</p><h2>{title}</h2><p>{description}</p></a>)}</div>
-          {rsvp && <><p className="saved-preferences">{rsvp.keepUpdated ? `You opted into wedding updates ${rsvp.hasWhatsapp ? 'on WhatsApp' : 'by email'}. We'll share details when they're ready.` : 'You opted out of wedding updates. You can always check the details here.'} No messages are sent automatically by this local website.</p>
+          {rsvp && <><p className="saved-preferences">{rsvp.whatsappUpdates || rsvp.emailUpdates ? `You opted into wedding updates via ${[rsvp.whatsappUpdates && 'WhatsApp', rsvp.emailUpdates && 'email'].filter(Boolean).join(' and ')}. We'll share details when they're ready.` : 'You opted out of wedding updates. You can always check the details here.'} No messages are sent automatically by this website.</p>
           <button className="text-link forget-button" onClick={forget}>Not you? Clear this browser's RSVP access</button></>}
         </section>}
       {hasGuestAccess && !restoring && <PageNavigation currentPage={currentPage} hasRsvp={Boolean(rsvp)} />}

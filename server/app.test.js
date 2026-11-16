@@ -7,10 +7,10 @@ import { once } from 'node:events';
 import { DatabaseSync } from 'node:sqlite';
 import { createApp } from './app.js';
 
-const valid = { name: 'Guest One', email: 'guest@example.com', phone: '+972 50 123 4567', hasWhatsapp: true, keepUpdated: true, attendance: 'yes', guests: ['Guest One'], dietary: 'Vegetarian', message: 'See you there!' };
+const valid = { name: 'Guest One', email: 'guest@example.com', phone: '+972 50 123 4567', whatsappUpdates: true, emailUpdates: true, attendance: 'yes', guests: ['Guest One'], dietary: 'Vegetarian', message: 'See you there!' };
 
-async function fixture(t) {
-  const { app, database } = createApp({ databasePath: ':memory:', serveStatic: false });
+async function fixture(t, recovery = null) {
+  const { app, database } = createApp({ databasePath: ':memory:', serveStatic: false, recovery });
   const server = app.listen(0, '127.0.0.1');
   await once(server, 'listening');
   t.after(async () => {
@@ -33,15 +33,15 @@ test('saves contact preferences and edits an RSVP with its private access key', 
   const { token } = await created.json();
   assert.match(token, /^[a-f0-9]{64}$/);
   assert.deepEqual((await (await get(token)).json()).rsvp, valid);
-  assert.equal((await put({ ...valid, attendance: 'no', guests: [], hasWhatsapp: false, keepUpdated: false }, token)).status, 200);
+  assert.equal((await put({ ...valid, attendance: 'no', guests: [], whatsappUpdates: false, emailUpdates: false }, token)).status, 200);
   const rows = database.prepare('SELECT * FROM rsvps').all();
   assert.equal(rows.length, 1);
   assert.equal(rows[0].email, 'guest@example.com');
   assert.equal(rows[0].attendance, 'no');
   assert.deepEqual(JSON.parse(rows[0].guests), []);
   assert.equal(rows[0].phone, valid.phone);
-  assert.equal(rows[0].has_whatsapp, 0);
-  assert.equal(rows[0].keep_updated, 0);
+  assert.equal(rows[0].whatsapp_updates, 0);
+  assert.equal(rows[0].email_updates, 0);
   assert.equal(rows[0].dietary, '');
 });
 
@@ -76,8 +76,8 @@ test('rejects invalid fields and inconsistent attendance without saving', async 
     { ...valid, phone: '' }, { ...valid, phone: '123' },
     { ...valid, phone: '1234567890123456' }, { ...valid, phone: 'call me maybe' },
     { ...valid, phone: '+972<script>501234567' }, { ...valid, phone: null },
-    { ...valid, hasWhatsapp: undefined }, { ...valid, hasWhatsapp: 'yes' },
-    { ...valid, keepUpdated: null }, { ...valid, keepUpdated: 1 },
+    { ...valid, whatsappUpdates: undefined }, { ...valid, whatsappUpdates: 'yes' },
+    { ...valid, emailUpdates: null }, { ...valid, emailUpdates: 1 },
     { ...valid, guests: ['Someone Else'] },
   ]) assert.equal((await post(invalid)).status, 400);
   assert.equal(database.prepare('SELECT COUNT(*) AS count FROM rsvps').get().count, 0);
@@ -99,7 +99,7 @@ test('allows email changes without duplicates and prevents taking another email'
   const { token } = await (await post(valid)).json();
   await post({ ...valid, email: 'another@example.com' });
   assert.equal((await put({ ...valid, email: 'another@example.com' }, token)).status, 409);
-  const changed = { ...valid, email: 'new@example.com', hasWhatsapp: false, keepUpdated: true };
+  const changed = { ...valid, email: 'new@example.com', whatsappUpdates: false, emailUpdates: true };
   assert.equal((await put(changed, token)).status, 200);
   assert.deepEqual((await (await get(token)).json()).rsvp, changed);
   assert.equal(database.prepare('SELECT COUNT(*) AS count FROM rsvps').get().count, 2);
@@ -165,7 +165,9 @@ test('extends the old attendance constraint without losing responses or edit key
     legacy.close();
     const first = createApp({ databasePath: path, serveStatic: false });
     try {
-      assert.deepEqual(first.database.prepare('SELECT * FROM rsvps ORDER BY id').all(), original);
+      const migrated = first.database.prepare('SELECT * FROM rsvps ORDER BY id').all();
+      assert.deepEqual(migrated.map(({ whatsapp_updates, email_updates, ...row }) => row), original.map(row => ({ ...row })));
+      assert.deepEqual(migrated.map(row => [row.whatsapp_updates, row.email_updates]), [[1, 0], [0, 1]]);
       first.database.prepare("UPDATE rsvps SET attendance='undecided', guests='[]', dietary='' WHERE id=11").run();
       assert.throws(() => first.database.prepare("UPDATE rsvps SET attendance='maybe' WHERE id=11").run());
       assert.throws(() => first.database.prepare('UPDATE rsvps SET edit_token=? WHERE id=12').run('c'.repeat(64)));
@@ -177,13 +179,61 @@ test('extends the old attendance constraint without losing responses or edit key
       const restored = second.database.prepare('SELECT * FROM rsvps WHERE id=11').get();
       assert.equal(restored.attendance, 'undecided');
       assert.equal(restored.edit_token, original[0].edit_token);
-      assert.deepEqual(second.database.prepare('SELECT * FROM rsvps WHERE id=12').get(), original[1]);
+      assert.deepEqual({ ...second.database.prepare('SELECT * FROM rsvps WHERE id=12').get() }, { ...original[1], whatsapp_updates: 0, email_updates: 1 });
     } finally {
       second.database.close();
     }
   } finally {
     rmSync(directory, { recursive: true, force: true });
   }
+});
+
+test('preserves independent communication preferences when creating and editing', async t => {
+  const { post, put, get } = await fixture(t);
+  const { token } = await (await post(valid)).json();
+  for (const [whatsappUpdates, emailUpdates] of [[true, true], [true, false], [false, true], [false, false]]) {
+    const reply = { ...valid, whatsappUpdates, emailUpdates };
+    assert.equal((await put(reply, token)).status, 200);
+    assert.deepEqual((await (await get(token)).json()).rsvp, reply);
+  }
+});
+
+test('emails a single-use recovery link for email or phone without revealing a match', async t => {
+  const emails = [];
+  const { post, get, base, database } = await fixture(t, { siteUrl: 'https://example.com/wedding/', sendEmail: async email => emails.push(email) });
+  const { token: originalToken } = await (await post(valid)).json();
+  const request = identifier => fetch(`${base}/api/rsvps/recovery`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ identifier }) });
+  const consume = token => fetch(`${base}/api/rsvps/recovery/consume`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token }) });
+  const unknown = await request('missing@example.com');
+  const known = await request(' GUEST@example.com ');
+  assert.equal(known.status, 200);
+  assert.deepEqual(await unknown.json(), await known.json());
+  assert.equal(emails.length, 1);
+  assert.equal(emails[0].to, valid.email);
+  const firstToken = new URLSearchParams(new URL(emails[0].link).hash.slice(1)).get('recover');
+  assert.notEqual(database.prepare('SELECT token_hash FROM rsvp_recovery').get().token_hash, firstToken);
+  const accepted = await consume(firstToken);
+  assert.equal(accepted.status, 200);
+  assert.equal((await accepted.json()).token, originalToken);
+  assert.equal((await consume(firstToken)).status, 400);
+  assert.equal((await request('+972 (50) 123-4567')).status, 200);
+  assert.equal(emails.length, 2);
+  const secondToken = new URLSearchParams(new URL(emails[1].link).hash.slice(1)).get('recover');
+  assert.equal((await request('guest@example.com')).status, 200);
+  assert.equal((await consume(secondToken)).status, 400);
+  const thirdToken = new URLSearchParams(new URL(emails[2].link).hash.slice(1)).get('recover');
+  database.prepare('UPDATE rsvp_recovery SET expires_at=0').run();
+  assert.equal((await consume(thirdToken)).status, 400);
+  assert.equal((await get(originalToken)).status, 200);
+});
+
+test('limits recovery requests and reports missing recovery configuration', async t => {
+  const { base } = await fixture(t, { siteUrl: 'https://example.com/', sendEmail: async () => {} });
+  const request = () => fetch(`${base}/api/rsvps/recovery`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ identifier: 'unknown@example.com' }) });
+  for (let i = 0; i < 3; i++) assert.equal((await request()).status, 200);
+  assert.equal((await request()).status, 429);
+  const unconfigured = await fixture(t);
+  assert.equal((await fetch(`${unconfigured.base}/api/rsvps/recovery`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ identifier: valid.email }) })).status, 503);
 });
 
 test('does not expose guest details over the API', async t => {
