@@ -1,31 +1,52 @@
-// Replace these sample details before sharing the site with your guests.
 export const wedding = {
-  names: ['Alex', 'Jamie'],
-  destination: 'Lisbon, Portugal',
-  displayDate: 'June 19, 2027',
-  deadline: 'May 1, 2027',
-  sample: true,
-  mapCenter: [38.7135, -9.1375],
-  story: 'One first date. Two passports. A whole lot of adventures. Now we’re packing our bags for our favorite one yet — getting married, with all our favorite people.',
+  names: ['Noa', 'Tom'],
+  destination: 'Hadera, Israel',
+  displayDate: 'Sep 2nd, 2027',
+  ceremonyStartsAt: '2027-09-02T20:00:00+03:00',
+  venue: {
+    name: 'Al Hanahal',
+    translation: 'By the River',
+    website: 'https://eco.ocm.co.il/',
+    instagram: 'https://www.instagram.com/alhanahalevent/',
+  },
 };
 
 export const events = [
-  { day: 'FRIDAY', date: '18', month: 'JUN', title: 'The hello party', time: '6:00 PM – 9:00 PM', location: 'Welcome drinks · location to come', description: 'You made it! Let’s catch up over a drink and a sunset.', dress: 'Come as you are', icon: 'wine' },
-  { day: 'SATURDAY', date: '19', month: 'JUN', title: 'The big “I do”', time: '4:00 PM – late', location: 'Ceremony & celebration · venue to come', description: 'A few happy tears, a very good dinner, and a full dance floor.', dress: 'Colorful cocktail attire', icon: 'heart' },
-  { day: 'SUNDAY', date: '20', month: 'JUN', title: 'One last pastel', time: '10:00 AM – 12:00 PM', location: 'Farewell brunch · location to come', description: 'Coffee, pastries, and hugs before your next adventure.', dress: 'Sunday easy', icon: 'coffee' },
+  { when: '17:30 / 5:30 PM', title: 'Next stop: the wedding.', description: 'Pickup from Tel Aviv Arlozorov Train Station for the journey to Al Hanahal. \u{1F68C}' },
+  { when: '19:00 / 7 PM', title: 'Hello, favorite people.', description: 'Arrival and reception at Al Hanahal (By the River). Find your people, settle in, and let the evening begin. \u{1F942}' },
+  { when: '20:00 / 8 PM', title: 'A very big little word: yes.', description: 'The ceremony - Huppah. Our yes, under one canopy. A moment for the two of us, shared with all of you. \u{1F48D}', info: 'A chuppah (also spelled huppah) is the canopy under which a Jewish couple stands during their wedding, symbolizing the new home they will build together.' },
+  { when: '21:00 / 9 PM', title: 'Full plates. Fuller hearts.', description: 'Dinner, conversation, and a toast to being together. \u{1F37D}\uFE0F Add your dietary needs to your RSVP so we can plan ahead.' },
+  { when: '22:00 / 10 PM', title: 'Meet us on the dance floor.', description: 'The dance floor is calling. This is your cue. \u{1FAA9}' },
+  { when: '00:00 / 12 AM', title: 'Still dancing? Good.', description: 'Midnight, and even more dance. Some late-night refuel for one more song \u{1F354}. And then probably more \u{1F483}' },
 ];
 
-export const places = [
-  { id: 'alfama', name: 'Get lost in Alfama', category: 'WANDER', owner: 'hers', description: 'Tiny streets, tiled walls, and a beautiful surprise around every corner. Leave the itinerary at home.', neighborhood: 'Alfama', coordinates: [38.7112, -9.1294], color: 'peach', art: 'streets', tip: 'Her tip: go early, wear comfy shoes.', url: 'https://www.visitlisboa.com/en/places/alfama' },
-  { id: 'timeout', name: 'A little taste of everything', category: 'EAT & DRINK', owner: 'his', description: 'Time Out Market is the answer when you can’t decide what to eat. Come hungry. Really hungry.', neighborhood: 'Cais do Sodré', coordinates: [38.7067, -9.1456], color: 'yellow', art: 'food', tip: 'His tip: share a few dishes, then get dessert.', url: 'https://www.timeoutmarket.com/lisboa/en/' },
-  { id: 'viewpoint', name: 'Meet you at golden hour', category: 'TAKE IT IN', owner: 'hers', description: 'The view from Miradouro da Graça: terracotta rooftops, the river, and the city doing its thing.', neighborhood: 'Graça', coordinates: [38.7165, -9.1314], color: 'lilac', art: 'sunset', tip: 'Her tip: make a little time for the sunset.', url: 'https://www.visitlisboa.com/en/places/miradouro-da-graca' },
-  { id: 'belem', name: 'The original sweet stop', category: 'SWEET TOOTH', owner: 'his', description: 'Warm custard tarts at Pastéis de Belém. A little cinnamon, a little powdered sugar, a lot of happiness.', neighborhood: 'Belém', coordinates: [38.6975, -9.2032], color: 'mint', art: 'pastry', tip: 'His tip: order an extra one. Trust me.', url: 'https://pasteisdebelem.pt/en/' },
+const telAviv = { area: 'TEL AVIV-JAFFA / ARRIVE & EXHALE', title: 'Start with a sea breeze.', description: 'Ease into the trip with a walk along the promenade, a wander through old Jaffa, and a long lunch. Leave room for the Carmel Market and an unhurried coffee.', tip: 'Our recipe: explore in the morning, hide from the midday heat, return for sunset.' };
+const hadera = { area: 'HADERA & THE COAST / THE MAIN EVENT', title: 'A wedding, with a side of sea.', description: `Be near Hadera for ${wedding.displayDate}, when we celebrate at ${wedding.venue.name}. If you have a spare morning, consider Caesarea for ancient ruins beside the water, or a relaxed coastal stop nearby.`, tip: 'Leave plenty of time to get ready. Wedding pickup is at 17:30 / 5:30 PM from Tel Aviv Arlozorov Train Station.' };
+const jerusalem = { area: 'JERUSALEM / A CHANGE OF PACE', title: 'Streets with stories.', description: 'Allow a full day or two for Jerusalem. Explore the Old City respectfully, then make time for the food stalls around Mahane Yehuda. A local guide can add a lot to the experience.', tip: 'Bring comfortable shoes and clothing that covers shoulders and knees for religious sites.' };
+const north = { area: 'THE NORTH / THE SLOW FINISH', title: 'Take the scenic way home.', description: 'If conditions allow, add Haifa and a coastal day around Acre, or trade another city for a slower countryside stay. Keep this part flexible rather than packing every day.', tip: 'Check current travel advice and site access before planning northern excursions.' };
+
+export const trips = [
+  { id: 'short', label: 'The long weekend', duration: '3-4 days', subtitle: 'SHORT TRIP. GOOD PRIORITIES.', title: 'A little coast, a big celebration.', description: 'For the fly-in, hug-everyone, dance-all-night crowd. Keep the route simple and let the wedding be the centerpiece.', stops: [telAviv, hadera] },
+  { id: 'week', label: 'The sweet spot', duration: '7 days', subtitle: 'OUR VOTE: STAY A LITTLE LONGER.', title: 'One week. Three different rhythms.', description: `A few days by the sea, our wedding in the middle, and time for Jerusalem. Arrange the order around ${wedding.displayDate} rather than racing through a checklist.`, stops: [telAviv, hadera, jerusalem] },
+  { id: 'long', label: 'The full adventure', duration: '10 days', subtitle: 'FOR THE JUST-ONE-MORE-DAY PEOPLE.', title: 'Room to wander. Room to breathe.', description: 'Take the one-week route and give it space. Add the north if travel advice allows, stay an extra night somewhere you love, and never skip lunch for an itinerary.', stops: [telAviv, hadera, jerusalem, north] },
 ];
 
-export const faqs = [
-  { question: 'What should I wear?', answer: 'Think colorful cocktail: something that makes you feel good and is ready for the dance floor. Lisbon has cobblestones, so block heels or comfortable shoes are a good idea. Final venue and dress details will be added here.' },
-  { question: 'Where should I stay?', answer: 'Baixa, Chiado, and Avenida da Liberdade are central neighborhoods to explore. We’ll add hotel recommendations and any group booking details once the venue is confirmed.' },
-  { question: 'Can I bring a plus-one or children?', answer: 'Your invitation will list everyone included in your party. Please RSVP for those guests only. We’ll confirm the children policy here before invitations go out.' },
-  { question: 'How do I get around?', answer: 'Lisbon has a metro, buses, trams, and taxis. Many central sights are walkable, but the hills are real! Airport and wedding transport details will be added once plans are finalized.' },
-  { question: 'What about dietary requirements?', answer: 'Tell us about allergies or dietary requirements in your RSVP so we can plan with our caterer. If anything changes later, submit your RSVP again with the same email to update it.' },
+export const coupleRecommendations = [
+  { category: 'Coffee', emoji: '\u2615', tagline: 'First coffee. Then everything else.', noa: null, tom: null },
+  { category: 'Shawarma', emoji: '\u{1F959}', tagline: 'A very important research project.', noa: null, tom: null },
+  { category: 'Wine', emoji: '\u{1F377}', tagline: 'One glass. A very long lunch.', noa: null, tom: null },
+  { category: 'Cocktails', emoji: '\u{1F378}', tagline: 'For the pre-party party.', noa: null, tom: null },
+  { category: 'Hike', emoji: '\u{1F97E}', tagline: 'Take the scenic route.', noa: null, tom: null },
+  { category: 'Beach', emoji: '\u{1F3D6}\uFE0F', tagline: 'Saltwater fixes most things.', noa: null, tom: null },
+  { category: 'Breakfast', emoji: '\u{1F373}', tagline: 'Worth getting out of bed for.', noa: null, tom: null },
+  { category: 'Something sweet', emoji: '\u{1F366}', tagline: 'There is always room.', noa: null, tom: null },
+];
+
+export const travelNotes = [
+  { title: 'Before you book', description: 'Security conditions, flights, and access can change. Consult your own government travel advice, book flexibly, and check insurance coverage. These are inspiration notes, not a guarantee that any route will be suitable in 2027.', url: 'https://www.gov.uk/foreign-travel-advice/israel', linkLabel: 'Read current UK travel advice' },
+  { title: 'Arriving in Israel', description: 'Ben Gurion Airport is the usual international arrival point. Check passport and visa requirements for your nationality. Visa-exempt visitors may need ETA-IL authorization; use the official government site for current rules.', url: 'https://israel-entry.piba.gov.il/', linkLabel: 'Check official entry requirements' },
+  { title: 'Getting to Hadera', description: 'Wedding pickup is at 17:30 / 5:30 PM from Tel Aviv Arlozorov Train Station, with arrival at Al Hanahal at 19:00 / 7 PM. Travelling independently? Hadera West has rail connections, but you will need onward transport to the venue. Return transport details are still to come.' },
+  { title: 'The weekend rhythm', description: 'The wedding is on Thursday. Many public transport services stop from Friday afternoon into Saturday evening and on holidays. Check actual schedules before booking onward travel; taxis or a rental car may be needed.' },
+  { title: 'September essentials', description: 'Expect warm weather: pack sunscreen, water, light layers, and comfortable shoes. Plan outdoor exploring early or late. Keep wedding attire flexible until we announce the dress code.' },
+  { title: 'Where to stay', description: 'Stay near Hadera on the wedding night if you want a simpler journey home. Tel Aviv works as a city base for other days, but requires travel time. No hotel blocks or venue-specific accommodation are confirmed yet.' },
 ];
