@@ -1,6 +1,12 @@
-# A little love, a little Lisbon
+# Noa & Tom
 
-A colorful, responsive wedding website with an itinerary, his-and-hers recommendations, a Leaflet/OpenStreetMap highlights map, FAQs, and a real RSVP form backed by SQLite.
+An RSVP-first wedding website for **Sep 2nd, 2027 at Al Hanahal (By the River), Hadera, Israel**. The landing page uses the couple's own photograph, locally bundled fonts, and a Mediterranean after-party palette: pale sky blue, electric cobalt, butter-yellow selections with navy text, and subtle coral-pink accents. All guest-facing dates use the same written format to avoid international date ambiguity.
+
+Guests provide their name, country calling code and phone number, email, attendance, WhatsApp availability, and an explicit wedding-update preference. Israel (+972) is the default; a country selector and custom-code option support international guests. Choosing no WhatsApp reveals a gentle joke and an email-update opt-in. Optional fields cover invited guests and dietary needs.
+
+Attendance choices are **Wouldn't miss it**, **Can't make it**, and **I don't know yet**. Undecided replies are saved separately from acceptances and declines, unlock the guest pages, and can be edited later. They do not count as confirmed guests; party and dietary details are collected when accepting. Existing replies and private edit keys are preserved when the database upgrades to support this status.
+
+After replying, guests can visit separate views for **Edit RSVP**, **Wedding Day Itinerary**, and **Your Perfect Israel Trip**. The itinerary includes the venue links and six scheduled events, starting with pickup from Tel Aviv Arlozorov Train Station at 17:30 / 5:30 PM. Times appear in both 24-hour and AM/PM formats, local to Israel, with dancing and late-night food at midnight. A few emojis add playful accents to the descriptions. The Huppah info icon explains the canopy on hover, focus, or tap. The travel guide offers 3-4, 7, and 10-day routes and practical planning advice. Dress code and return transport details are still to come.
 
 ## Start locally
 
@@ -13,25 +19,44 @@ npm run dev
 
 Open **http://127.0.0.1:5173**. The API runs on port 3001. Both bind only to your local machine by default.
 
-## Make it yours
+While running `npm run dev`, use **Skip RSVP for now** below the landing-page form to browse the guest hub, itinerary, and travel guide without submitting a response. This local preview persists across refreshes in the same tab using a session-only flag, not guest details or an RSVP edit key. Use **Back to landing page** to exit. The RSVP page remains available if you want to submit a real reply. The shortcut is not included in production builds.
 
-Edit `src/content.js` for names, dates, itinerary, recommendations, map coordinates, and FAQs. The initial Lisbon wedding is **sample content**, not a booked wedding. Replace placeholders and set `wedding.sample` to `false` when ready. Update the title and description in `index.html`, and Lisbon-specific copy in `src/main.jsx`, `src/RSVP.jsx`, and `src/HighlightsMap.jsx` if changing destinations. Original illustrations live in `src/Illustrations.jsx`; colors and layout live in `src/styles.css`.
+## Content and visuals
 
-Fonts and illustrations are bundled locally. Map tiles require internet access; the recommendations list and interactive pins still work when tiles cannot load, with an explicit warning. No paid map API key is needed. Check OpenStreetMap's [tile usage policy](https://operations.osmfoundation.org/policies/tiles/) before using its public tile service on a busy production site.
+- `src/content.js`: wedding details, evening schedule, trip routes, and travel notes.
+- `coupleRecommendations` in `src/content.js`: side-by-side Noa and Tom picks for coffee, shawarma, wine, cocktails, hikes, beaches, breakfast, and sweets on Explore Israel. Picks are explicitly coming soon; replace the `noa` and `tom` null values with the couple's actual recommendations.
+- `src/HuppahInfo.jsx`: accessible ceremony explanation tooltip.
+- `src/Countdown.jsx` and `src/weddingCountdown.js`: live header countdown to the Huppah at 20:00 in Israel on Sep 2nd, 2027.
+- `src/App.jsx`: RSVP landing page and post-RSVP navigation, including a separate **Intl? Must knows** tab (`#intl`) for practical travel advice. **Explore Israel** focuses on trip routes and links to the international essentials.
+- `src/PageNavigation.jsx`: previous/next arrows fixed to the left and right edges, guiding guests through the invitation, wedding day, Israel ideas, international essentials, and RSVP. Desktop arrows show their destination on hover or focus; compact mobile arrows have space reserved beside the content. Navigation never submits a reply. Guest pages fade in gently unless reduced motion is enabled.
+- `src/RSVP.jsx`: form and conditional update preferences.
+- `src/Confetti.jsx`: a short palette-colored celebration on acceptance clicks, respecting reduced-motion preferences.
+- `src/AttendanceReaction.jsx`: a gently pulsing heart for undecided guests and a flying love note for declines. Reactions restart on re-click, dismiss automatically, and become static supportive messages with reduced motion.
+- `src/styles.css`: responsive invitation styling.
+- `public/noa-and-tom.png`: the supplied background photograph.
+- `public/noa-tom-wedding-day.png`: the couple's photo behind the Wedding Day title, with a responsive readability overlay.
 
-## RSVPs
+The photo and fonts are served locally; no remote map, image, or font request is needed. Travel links open official external resources. Recheck entry requirements, travel advice, and transport schedules before booking for 2027.
 
-Responses are stored in `data/rsvps.sqlite` on the server, **not** in browser storage. Submitting the same email updates its existing response. Party size includes the respondent and is capped at 10; guests are asked to include only people named on their invitation. This is not yet enforced by an invitation database.
+## Private, persistent RSVPs
 
-There is deliberately no public endpoint listing guest details. To inspect responses locally, from the project directory:
+Responses are saved in `data/rsvps.sqlite`, not in browser storage. Phone numbers and WhatsApp/update preferences are stored alongside attendance and guest details. The existing database is migrated without deleting old responses.
+
+The server issues a random private edit-access key on submission. Only that key is stored in this browser, allowing guests to restore and edit their own RSVP after refreshing. The authorized edit endpoint permits changing email addresses without creating duplicate responses. Knowing someone's email alone does not grant access to their RSVP.
+
+There is no public endpoint listing guest details. On a shared computer, use **Clear this browser's RSVP access** in the guest hub when finished. Treat the key as a secret. Editing from a different browser or after clearing access currently requires contacting the hosts; there is no email-based recovery yet. Legacy responses are preserved but do not gain a browser edit key automatically.
+
+No WhatsApp messages or emails are sent automatically. Update selections record guests' preferences for the hosts to use later; they are not a messaging integration.
+
+To inspect responses locally:
 
 ```sh
-node --input-type=module -e "import { DatabaseSync } from 'node:sqlite'; const db = new DatabaseSync('data/rsvps.sqlite', { readOnly: true }); console.table(db.prepare('SELECT name, email, attendance, guests, dietary, message, updated_at FROM rsvps').all()); db.close();"
+node --input-type=module -e "import { DatabaseSync } from 'node:sqlite'; const db = new DatabaseSync('data/rsvps.sqlite', { readOnly: true }); console.table(db.prepare('SELECT name, email, phone, has_whatsapp, keep_updated, attendance, guests, dietary, message, updated_at FROM rsvps').all()); db.close();"
 ```
 
-Keep the database private and back it up. Names, email addresses, and dietary notes can contain personal information; delete data when no longer needed. No emails are sent and no external RSVP service receives responses.
+Keep the database private, back it up, and delete guest data when no longer needed. Never place it inside the public build folder. Party size includes the respondent and is capped at 10; invitation-specific limits are not yet enforced.
 
-## Build and run
+## Validate and build
 
 ```sh
 npm test
@@ -39,27 +64,12 @@ npm run build
 npm start
 ```
 
-The production server serves the built site and API at **http://127.0.0.1:3001**. `PORT`, `HOST`, and `DATABASE_PATH` can be supplied as environment variables. Keep the database outside the public `dist` folder.
+The production server serves the built site and API at **http://127.0.0.1:3001**. `PORT`, `HOST`, and `DATABASE_PATH` can be set as environment variables.
 
-## A domain later
+## Hosting later
 
-### GitHub Pages prototype
+The GitHub Pages workflow builds a **preview only** with `VITE_RSVP_DEMO=true`. Use made-up details. It demonstrates the form and guest pages, but sends no requests, saves no responses or edit keys, and does not confirm attendance. Refreshing clears the preview reply.
 
-The public prototype is deployed by `.github/workflows/pages.yml` whenever `main` changes. Enable GitHub Pages with **GitHub Actions** as its source in repository Settings > Pages.
+For a real RSVP deployment, use a Node-compatible host with persistent storage for SQLite. Static-only hosting cannot run this API.
 
-The Pages build sets `VITE_RSVP_DEMO=true`: the form is explicitly a preview, sends no requests, and saves no responses (including in browser storage). Use made-up details. The regular local build keeps the working RSVP API.
-
-To preview the same static build locally:
-
-```sh
-VITE_BASE_PATH=/wedding-website/ VITE_RSVP_DEMO=true npm run build
-VITE_BASE_PATH=/wedding-website/ npx vite preview --host 127.0.0.1
-```
-
-Open `http://127.0.0.1:4173/wedding-website/`. To return to the local backend build, run `npm run build` without those environment variables.
-
-### Real RSVP deployment
-
-Use a Node-compatible host with a persistent disk for SQLite (or migrate to managed PostgreSQL). Build the site, set `HOST=0.0.0.0` where required by your host, and configure the domain and HTTPS through the hosting provider. Static-only hosting cannot run this RSVP API.
-
-**Before public launch:** replace and verify sample details, add invitation codes or email verification (the local prototype currently allows updates by anyone who knows a guest's email), add request rate limiting and abuse protection, and provide a suitable guest privacy notice. Plan authenticated RSVP management, backups, and email confirmations if needed. This local prototype is not yet a public invitation-management system.
+Before public launch, configure HTTPS, guest privacy information, invitation verification, request rate limits, secure host administration, backups, and a verified edit-access recovery process. Reconfirm all travel information and add the dress code and return transport details once finalized.
