@@ -56,7 +56,8 @@ test('builds length-specific planning prompts with wedding logistics and no inve
     assert.ok(prompt.includes(wedding.displayDate));
     assert.ok(prompt.includes(wedding.venue.name));
     assert.ok(prompt.includes(events[0].when));
-    assert.match(prompt, /Return transport is not yet confirmed/);
+    assert.ok(prompt.includes(`return bus to Tel Aviv will leave the venue around ${wedding.returnBusDeparture}`));
+    assert.match(prompt, /after midnight following the wedding/);
     assert.match(prompt, /recommendations.*are coming soon/);
     assert.match(prompt, /Do not book anything/);
     assert.doesNotMatch(prompt, /\bnull\b|\bundefined\b/);
@@ -80,4 +81,24 @@ test('includes only published personal recommendations in copied prompts', () =>
   assert.match(prompt, /Coffee: Noa recommends Example Cafe/);
   assert.match(prompt, /Beach: Tom recommends Example Beach/);
   assert.doesNotMatch(prompt, /Tom recommends null|Noa recommends null/);
+});
+
+test('longer routes and prompts include Jerusalem, Dead Sea, wineries, and optional Eilat', () => {
+  for (const id of ['week', 'long']) {
+    const trip = trips.find(option => option.id === id);
+    const jerusalem = trip.stops.find(stop => stop.area.startsWith('JERUSALEM'));
+    assert.match(jerusalem.description, /two days/);
+    assert.match(jerusalem.description, /Jewish, Christian, and Muslim/);
+    assert.match(jerusalem.description, /winery.*Judean Hills/);
+    assert.ok(trip.stops.some(stop => stop.area.startsWith('THE DEAD SEA')));
+    const prompt = buildTripPrompt(id);
+    assert.match(prompt, /two days in Jerusalem/);
+    assert.match(prompt, /one day at the Dead Sea/);
+    assert.match(prompt, /Judean Hills winery/);
+  }
+  assert.ok(trips.find(trip => trip.id === 'long').stops.some(stop => stop.area.startsWith('EILAT')));
+  assert.ok(!trips.find(trip => trip.id === 'week').stops.some(stop => stop.area.startsWith('EILAT')));
+  assert.match(buildTripPrompt('long'), /Ramon Airport near Eilat.*coral-reef diving/);
+  assert.match(buildTripPrompt('long'), /required no-fly interval/);
+  assert.doesNotMatch(buildTripPrompt('week'), /Eilat/);
 });
