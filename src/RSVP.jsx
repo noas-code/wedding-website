@@ -78,8 +78,8 @@ export default function RSVP({ initial, token, onSaved }) {
         </div>
         {countryChoice === 'custom' && <label>Your country calling code <span>*</span><input type="tel" name="customCountryCode" required maxLength={4} pattern={String.raw`\+[1-9][0-9]{0,2}`} title="Enter + followed by your 1 to 3 digit country calling code." autoComplete="tel-country-code" placeholder="e.g. +386" value={phone.countryCode} onChange={event => setPhone(previous => ({ ...previous, countryCode: event.target.value }))} /></label>}
         <label>Email address <span>*</span><input type="email" name="email" required maxLength={254} autoComplete="email" placeholder="you@example.com" value={response.email} onChange={event => update('email', event.target.value)} /></label>
-        <fieldset className="choice-field"><legend>How do you want us to communicate with you?</legend><p className="communication-hint">Choose either, both, or neither for wedding updates.</p><div className="choice-row">
-          {[['whatsappUpdates', 'WhatsApp'], ['emailUpdates', 'Email']].map(([field, label]) => <label className={response[field] ? 'choice selected' : 'choice'} key={field}><input type="checkbox" name={field} checked={response[field]} onChange={event => update(field, event.target.checked)} />{label}</label>)}
+        <fieldset className="choice-field"><legend>How do you want us to communicate with you?</legend><p className="communication-hint">Select all that apply. Leave both unchecked for no updates.</p><div className="choice-row">
+          {[['whatsappUpdates', 'WhatsApp'], ['emailUpdates', 'Email']].map(([field, label]) => <label className={response[field] ? 'communication-choice selected' : 'communication-choice'} key={field}><input type="checkbox" name={field} checked={response[field]} onChange={event => update(field, event.target.checked)} />{label}</label>)}
         </div></fieldset>
         {response.attendance === 'yes' && <details className="extra-details" open={initial ? true : undefined}>
           <summary>Guests, dietary needs & a note for us <span aria-hidden="true">+</span></summary>

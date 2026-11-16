@@ -118,6 +118,7 @@ export default function App() {
       {error && <div className="restore-error" role="alert">{error} <button type="button" onClick={() => location.reload()}>Try again</button></div>}
       {restoring ? <div className="loading" role="status">Opening your invitation...</div> :
         currentPage === 'home' && !hasGuestAccess ? <section className="invitation-layout">
+          <RecoverRSVP />
           <div className="invitation-copy" style={{ '--couple-photo': `url("${import.meta.env.BASE_URL}noa-and-tom.png")` }}>
             <p className="eyebrow"><span className="little-line" /> WE'RE GETTING MARRIED</p>
             <h1 ref={heading} tabIndex={-1}>Noa <span className="ampersand">&</span><br />Tom</h1>
@@ -126,7 +127,7 @@ export default function App() {
             <a className="photo-rsvp" href="#rsvp">Your RSVP <span aria-hidden="true">&darr;</span></a>
             <p className="photo-caption">THE NEXT CHAPTER STARTS WITH YOU.</p>
           </div>
-          <div className="invitation-form"><RSVP onSaved={saved} /><RecoverRSVP /><p className="form-footnote">A little reply. The beginning of a very good trip.</p>{import.meta.env.DEV && <div className="preview-entry"><button className="text-link" type="button" onClick={startPreview}>Skip RSVP for now <span aria-hidden="true">&rarr;</span></button><p>Local preview only. No response will be saved.</p></div>}</div>
+          <div className="invitation-form"><RSVP onSaved={saved} /><p className="form-footnote">A little reply. The beginning of a very good trip.</p>{import.meta.env.DEV && <div className="preview-entry"><button className="text-link" type="button" onClick={startPreview}>Skip RSVP for now <span aria-hidden="true">&rarr;</span></button><p>Local preview only. No response will be saved.</p></div>}</div>
         </section> :
         currentPage === 'edit' ? <section className="edit-layout" key="edit">
           <div><p className="eyebrow">{rsvp ? 'PLANS CHANGE. WE GET IT.' : 'WHEN YOU ARE READY'}</p><h1 className="page-title" ref={heading} tabIndex={-1}>{rsvp ? <>A little<br /><em>update.</em></> : <>Save us<br /><em>a dance.</em></>}</h1><p className="intro">{rsvp ? <>New number? A dietary note?<br />Keep your details as fresh as your dance moves.</> : 'Just exploring? Take your time. Submit this form only when you want to save a real RSVP.'}</p><a className="text-link" href="#home">Back to your invitation <span aria-hidden="true">&larr;</span></a></div>
