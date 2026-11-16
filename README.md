@@ -8,7 +8,7 @@ The invitation's RSVP card offers **RSVP / Edit RSVP** options, with edit-link r
 
 On mobile, **Your RSVP** scrolls smoothly to the form, with an instant jump when reduced motion is preferred.
 
-International essentials separates the Sunday-Thursday work week from transport guidance covering railways, buses, station tickets, Rav-Kav, Moovit/Pango, payment limitations, and modified weekend services. Destination-specific transport details are still to be added to the recommended itineraries.
+International essentials separates the Sunday-Thursday work week from transport guidance covering railways, buses, station tickets, Rav-Kav, Moovit/Pango, payment limitations, and modified weekend services. A car-sharing card links to AutoTel and GoTo and explains checking foreign-licence eligibility and International Driving Permit requirements. Destination-specific transport details are still to be added to the recommended itineraries.
 
 Attendance choices are **Wouldn't miss it**, **Can't make it**, and **I don't know yet**; none is selected by default. Accepting triggers confetti unless reduced motion is enabled. Undecided replies are saved separately from acceptances and declines, unlock the guest pages, and can be edited later. They do not count as confirmed guests; party and dietary details are collected when accepting.
 

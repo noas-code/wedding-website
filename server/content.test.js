@@ -113,3 +113,12 @@ test('separates transport guidance from the work-week explanation', () => {
     assert.match(transport.description, detail);
   }
 });
+
+test('provides car-sharing links and conditional international permit guidance', () => {
+  const driving = travelNotes.find(note => note.title === 'Car sharing & driving');
+  assert.match(driving.description, /few hours/);
+  assert.match(driving.description, /foreign-licence eligibility/);
+  assert.match(driving.description, /International Driving Permit/);
+  assert.match(driving.description, /does not replace it/);
+  assert.deepEqual(driving.links.map(link => new URL(link.url).hostname), ['www.autotel.co.il', 'gotoglobal.com']);
+});

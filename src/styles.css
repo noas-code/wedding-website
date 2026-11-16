@@ -259,6 +259,7 @@ small{display:block;font-size:10px;color:var(--muted);line-height:1.6;margin-top
 .rec-place{font-size:13px;line-height:1.7;color:var(--ink);overflow-wrap:anywhere}
 .travel-note-grid p{font-size:12px;line-height:1.9;color:var(--muted)}
 .travel-note-grid a{margin-top:15px;font-size:10px}
+.travel-note-links{display:flex;flex-direction:column;align-items:flex-start}
 footer{border-top:1px solid var(--line);padding:27px 0 31px;display:flex;align-items:center;justify-content:space-between;gap:20px;color:var(--muted)}
 footer>span:first-child{font-family:var(--serif);font-style:italic;font-size:20px;color:var(--accent)}
 footer p{font-size:10px}

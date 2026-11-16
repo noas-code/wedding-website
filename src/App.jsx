@@ -160,7 +160,7 @@ export default function App() {
         </section> :
         currentPage === 'intl' ? <section className="inner-page" key="intl">
           <div className="page-heading"><div><p className="eyebrow">THE GOOD-TO-KNOW PART</p><h1 className="page-title" ref={heading} tabIndex={-1}>Less logistics.<br /><em>More living.</em></h1></div><p className="intro">Coming from abroad? Start here.<br />The practical bits, so you can focus on the good bits.</p></div>
-          <div className="travel-note-grid">{travelNotes.map(note => <article key={note.title}><h2>{note.title}</h2><p>{note.description}</p>{note.url && <a className="text-link" href={note.url} target="_blank" rel="noreferrer">{note.linkLabel} <span aria-hidden="true">&#8599;</span></a>}</article>)}</div>
+          <div className="travel-note-grid">{travelNotes.map(note => <article key={note.title}><h2>{note.title}</h2><p>{note.description}</p>{note.url && <a className="text-link" href={note.url} target="_blank" rel="noreferrer">{note.linkLabel} <span aria-hidden="true">&#8599;</span></a>}{note.links && <div className="travel-note-links">{note.links.map(link => <a className="text-link" key={link.url} href={link.url} target="_blank" rel="noreferrer">{link.label} <span aria-hidden="true">&#8599;</span></a>)}</div>}</article>)}</div>
         </section> :
         hasGuestAccess && <section className="inner-page guest-hub" key="home">
           <p className="eyebrow">{!rsvp || demoMode ? 'PREVIEW ONLY / NO RSVP SAVED' : 'YOUR REPLY IS SAVED / THANK YOU FOR LETTING US KNOW'}</p>
