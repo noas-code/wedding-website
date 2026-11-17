@@ -29,6 +29,8 @@ Open **http://127.0.0.1:5173**. The API runs on port 3001. Both bind only to you
 
 While running `npm run dev`, use **Skip RSVP for now** below the landing-page form to browse the guest hub, itinerary, and travel guide without submitting a response. This local preview persists across refreshes in the same tab using a session-only flag, not guest details or an RSVP edit key. Use **Back to landing page** to exit. The RSVP page remains available if you want to submit a real reply. The shortcut is not included in production builds.
 
+Add `?bypassRSVP=1` to the site URL to browse as **Preview Guest**, including on the hosted site. Mock edits stay in memory and never call the RSVP API or overwrite saved browser access. Refreshing resets the mock reply; **Exit mock preview** removes the flag and returns to the normal site. This only bypasses the guest-page UI, not API authorization.
+
 ## Content and visuals
 
 - `src/content.js`: wedding details, evening schedule, trip routes, and travel notes.

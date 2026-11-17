@@ -4,10 +4,10 @@ import Confetti from './Confetti';
 import AttendanceReaction from './AttendanceReaction';
 import RecoverRSVP from './RecoverRSVP';
 
-const demoMode = import.meta.env.VITE_RSVP_DEMO === 'true';
 const emptyResponse = { name: '', email: '', phone: '', attendance: '', guests: [], dietary: '', message: '', whatsappUpdates: false, emailUpdates: false };
 
-export default function RSVP({ initial, token, onSaved }) {
+export default function RSVP({ initial, token, onSaved, previewOnly = false }) {
+  const demoMode = import.meta.env.VITE_RSVP_DEMO === 'true' || previewOnly;
   const [mode, setMode] = useState('new');
   const [response, setResponse] = useState(() => initial ? { ...initial, guests: initial.guests.slice(1) } : emptyResponse);
   const [guestCount, setGuestCount] = useState(initial?.guests.length || 1);
