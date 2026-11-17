@@ -11,14 +11,16 @@ const demoMode = import.meta.env.VITE_RSVP_DEMO === 'true';
 const pages = ['home', 'edit', 'itinerary', 'israel', 'picks', 'intl'];
 const tokenKey = 'noa-tom-rsvp-token';
 const previewKey = 'noa-tom-local-preview';
+const mockResponse = { name: 'Preview Guest', email: 'preview@example.com', phone: '+972 50 123 4567', attendance: 'yes', guests: ['Preview Guest'], dietary: '', message: '', whatsappUpdates: true, emailUpdates: true };
 
 export default function App() {
+  const [mockUser] = useState(() => new URLSearchParams(location.search).get('bypassRSVP') === '1');
   const [page, setPage] = useState(() => location.hash.slice(1) || 'home');
-  const [rsvp, setRsvp] = useState(null);
+  const [rsvp, setRsvp] = useState(() => mockUser ? mockResponse : null);
   const [preview, setPreview] = useState(() => import.meta.env.DEV && sessionStorage.getItem(previewKey) === '1');
   const [token, setToken] = useState('');
   const recoveryToken = useRef(new URLSearchParams(location.hash.slice(1)).get('recover'));
-  const [restoring, setRestoring] = useState(!demoMode && Boolean(recoveryToken.current || localStorage.getItem(tokenKey)));
+  const [restoring, setRestoring] = useState(!demoMode && !mockUser && Boolean(recoveryToken.current || localStorage.getItem(tokenKey)));
   const [error, setError] = useState('');
   const [trip, setTrip] = useState('week');
   const heading = useRef(null);
@@ -33,7 +35,7 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    if (demoMode) return;
+    if (demoMode || mockUser) return;
     const savedToken = localStorage.getItem(tokenKey);
     const recoveryLink = recoveryToken.current;
     if (!savedToken && !recoveryLink) return;
@@ -89,7 +91,7 @@ export default function App() {
   }
 
   function saved(response, editToken) {
-    if (!demoMode) localStorage.setItem(tokenKey, editToken);
+    if (!demoMode && !mockUser) localStorage.setItem(tokenKey, editToken);
     setToken(editToken);
     setRsvp(response);
     endPreview();
@@ -101,6 +103,13 @@ export default function App() {
     setToken('');
     setError('');
     endPreview();
+  }
+
+  function exitMock() {
+    const url = new URL(location.href);
+    url.searchParams.delete('bypassRSVP');
+    url.hash = '';
+    location.assign(url.href);
   }
 
   return <div className={hasGuestAccess ? 'site-shell guest-access' : 'site-shell'}>
@@ -115,6 +124,7 @@ export default function App() {
       <div className="header-celebration"><span className="header-date">{wedding.displayDate}</span></div>
     </header>
     <main id="main">
+      {mockUser && <div className="preview-banner"><p>Mock user preview / no RSVP is saved</p><button type="button" onClick={exitMock}>Exit mock preview</button></div>}
       {preview && !rsvp && <div className="preview-banner"><p>Local preview / no RSVP saved</p><button type="button" onClick={endPreview}>Back to landing page</button></div>}
       {error && <div className="restore-error" role="alert">{error} <button type="button" onClick={() => location.reload()}>Try again</button></div>}
       {restoring ? <div className="loading" role="status">Opening your invitation...</div> :
@@ -131,7 +141,7 @@ export default function App() {
         </section> :
         currentPage === 'edit' ? <section className="edit-layout" key="edit">
           <div><p className="eyebrow">{rsvp ? 'PLANS CHANGE. WE GET IT.' : 'WHEN YOU ARE READY'}</p><h1 className="page-title" ref={heading} tabIndex={-1}>{rsvp ? <>A little<br /><em>update.</em></> : <>Save us<br /><em>a dance.</em></>}</h1><p className="intro">{rsvp ? <>New number? A dietary note?<br />Keep your details as fresh as your dance moves.</> : 'Just exploring? Take your time. Submit this form only when you want to save a real RSVP.'}</p><a className="text-link" href="#home">Back to your invitation <span aria-hidden="true">&larr;</span></a></div>
-          <RSVP initial={rsvp} token={token} onSaved={saved} />
+          <RSVP initial={rsvp} token={token} onSaved={saved} previewOnly={mockUser} />
         </section> :
         currentPage === 'itinerary' ? <section className="inner-page wedding-day" key="itinerary">
           <div className="wedding-hero">
@@ -163,7 +173,7 @@ export default function App() {
           <div className="travel-note-grid">{travelNotes.map(note => <article key={note.title}><h2><span className="travel-note-emoji" aria-hidden="true">{note.emoji}</span>{note.title}</h2><p>{note.description}</p>{note.url && <a className="text-link" href={note.url} target="_blank" rel="noreferrer">{note.linkLabel} <span aria-hidden="true">&#8599;</span></a>}{note.links && <div className="travel-note-links">{note.links.map(link => <a className="text-link" key={link.url} href={link.url} target="_blank" rel="noreferrer">{link.label} <span aria-hidden="true">&#8599;</span></a>)}</div>}</article>)}</div>
         </section> :
         hasGuestAccess && <section className="inner-page guest-hub" key="home">
-          <p className="eyebrow">{!rsvp || demoMode ? 'PREVIEW ONLY / NO RSVP SAVED' : 'YOUR REPLY IS SAVED / THANK YOU FOR LETTING US KNOW'}</p>
+          <p className="eyebrow">{!rsvp || demoMode || mockUser ? 'PREVIEW ONLY / NO RSVP SAVED' : 'YOUR REPLY IS SAVED / THANK YOU FOR LETTING US KNOW'}</p>
           <h1 className="page-title" ref={heading} tabIndex={-1}>{!rsvp ? <>The party<br /><em>starts here.</em></> : rsvp.attendance === 'yes' ? <>See you there,<br /><em>{rsvp.name.split(' ')[0]}.</em></> : rsvp.attendance === 'undecided' ? <>Take your time,<br /><em>{rsvp.name.split(' ')[0]}.</em></> : <>We'll miss you,<br /><em>{rsvp.name.split(' ')[0]}.</em></>}</h1>
           <p className="hub-message">{!rsvp ? 'Explore the wedding day and plan a little adventure. Your RSVP can wait until you are ready.' : rsvp.attendance === 'yes' ? 'You bring yourself. We bring a night to remember.' : rsvp.attendance === 'undecided' ? 'Your RSVP is saved as undecided. Explore the plans, and update your reply when you know.' : 'Thank you for letting us know. There is still a little adventure here for you.'}</p>
           <div className="hub-date"><span>{wedding.displayDate}</span><span>{wedding.venue.name} / {wedding.destination}</span></div>
@@ -175,7 +185,7 @@ export default function App() {
             ['intl', '05', 'The good-to-know part', 'Intl? Must knows', 'Entry requirements, getting here, and the practical bits for guests coming from abroad.'],
           ].map(([id, number, label, title, description]) => <a className="hub-card" href={`#${id}`} key={id}><div><span>{number}</span><span aria-hidden="true">&#8599;</span></div><p className="eyebrow">{label}</p><h2>{title}</h2><p>{description}</p></a>)}</div>
           {rsvp && <><p className="saved-preferences">{rsvp.whatsappUpdates || rsvp.emailUpdates ? `You opted into wedding updates via ${[rsvp.whatsappUpdates && 'WhatsApp', rsvp.emailUpdates && 'email'].filter(Boolean).join(' and ')}. We'll share details when they're ready.` : 'You opted out of wedding updates. You can always check the details here.'} No messages are sent automatically by this website.</p>
-          <button className="text-link forget-button" onClick={forget}>Not you? Clear this browser's RSVP access</button></>}
+          <button className="text-link forget-button" onClick={mockUser ? exitMock : forget}>{mockUser ? 'Exit mock preview' : "Not you? Clear this browser's RSVP access"}</button></>}
         </section>}
       {hasGuestAccess && !restoring && <PageNavigation currentPage={currentPage} hasRsvp={Boolean(rsvp)} />}
     </main>
